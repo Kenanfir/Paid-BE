@@ -1,0 +1,1095 @@
+{
+    "info": {
+        "name": "Paid-BE API Collection",
+        "description": "Complete API collection for Paid Backend - Bill splitting with face detection, expense management, and payment tracking",
+        "version": "2.0.0",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{auth_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000/api",
+            "type": "string"
+        },
+        {
+            "key": "auth_token",
+            "value": "",
+            "type": "string",
+            "description": "JWT token for authenticated user"
+        },
+        {
+            "key": "session_id",
+            "value": "",
+            "type": "string",
+            "description": "Current session UUID"
+        },
+        {
+            "key": "player_id",
+            "value": "",
+            "type": "string",
+            "description": "Current player UUID"
+        },
+        {
+            "key": "obligation_id",
+            "value": "",
+            "type": "string",
+            "description": "Current obligation UUID"
+        },
+        {
+            "key": "payment_id",
+            "value": "",
+            "type": "string",
+            "description": "Current payment UUID"
+        },
+        {
+            "key": "expense_id",
+            "value": "",
+            "type": "string",
+            "description": "Current expense UUID"
+        },
+        {
+            "key": "magic_link_token",
+            "value": "",
+            "type": "string",
+            "description": "Magic link token for player access"
+        }
+    ],
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/health",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "health"
+                    ]
+                },
+                "description": "Check if the API is running"
+            }
+        },
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "auth": {
+                        "type": "noauth"
+                    },
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"felly@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Felly\",\n  \"phone\": \"+62811111111\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const response = pm.response.json();",
+                                    "  pm.collectionVariables.set('auth_token', response.data?.token || '');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Login User",
+                    "auth": {
+                        "type": "noauth"
+                    },
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"felly@example.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  const response = pm.response.json();",
+                                    "  pm.collectionVariables.set('auth_token', response.data?.token || '');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Generate Magic Link",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"playerId\": \"{{player_id}}\",\n  \"purpose\": \"payment\",\n  \"expiresInHours\": 24\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/magic-link",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "magic-link"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  const response = pm.response.json();",
+                                    "  pm.collectionVariables.set('magic_link_token', response.data?.token || '');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Verify Magic Link",
+                    "auth": {
+                        "type": "noauth"
+                    },
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"token\": \"{{magic_link_token}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/magic-link/verify",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "magic-link",
+                                "verify"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "Get My Profile",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/users/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "me"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update My Profile",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Felly Updated\",\n  \"phone\": \"+62822222222\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/users/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "me"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Sessions (as Host)",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/users/me/sessions?status=all&page=1&limit=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "me",
+                                "sessions"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "all"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Payment Summary",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/users/me/summary",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "me",
+                                "summary"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Sessions",
+            "description": "Bill splitting session management",
+            "item": [
+                {
+                    "name": "Create Session",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Badminton Pemogan\",\n  \"description\": \"Sunday morning session\",\n  \"date\": \"2025-07-26T00:00:00Z\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const response = pm.response.json();",
+                                    "  pm.collectionVariables.set('session_id', response.data?.id || '');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get My Sessions",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions?role=all&status=all",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions"
+                            ],
+                            "query": [
+                                {
+                                    "key": "role",
+                                    "value": "all"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "all"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Session Details",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Session",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Badminton Pemogan Updated\",\n  \"description\": \"Updated description\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Session",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Add Players",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"players\": [\n    { \"name\": \"Jessica\", \"email\": \"jessica@example.com\" },\n    { \"name\": \"James\" },\n    { \"name\": \"Jason\", \"phone\": \"+62833333333\" },\n    { \"name\": \"Jeremy\" }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/players",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "players"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const response = pm.response.json();",
+                                    "  if (response.data?.players?.length > 0) {",
+                                    "    pm.collectionVariables.set('player_id', response.data.players[0].id || '');",
+                                    "  }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Remove Player",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/players/{{player_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "players",
+                                "{{player_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Upload Group Photo",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "photo",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/photo",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "photo"
+                            ]
+                        },
+                        "description": "Upload group photo for face detection"
+                    }
+                },
+                {
+                    "name": "Get Face Detection Results",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/faces",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "faces"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Confirm Face Mappings",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"confirmations\": [\n    { \"detectedFaceId\": \"uuid\", \"playerId\": \"{{player_id}}\" }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/faces/confirm",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "faces",
+                                "confirm"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Add Expense Items",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"items\": [\n    { \"description\": \"Court\", \"amount\": 60000, \"quantity\": 2 },\n    { \"description\": \"Shuttlecock\", \"amount\": 15000, \"quantity\": 1 }\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/expenses",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "expenses"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "  const response = pm.response.json();",
+                                    "  if (response.data?.items?.length > 0) {",
+                                    "    pm.collectionVariables.set('expense_id', response.data.items[0].id || '');",
+                                    "  }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Expense Summary",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/expenses",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "expenses"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Expense Item",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"description\": \"Court Updated\",\n  \"amount\": 65000,\n  \"quantity\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/expenses/{{expense_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "expenses",
+                                "{{expense_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Expense Item",
+                    "request": {
+                        "method": "DELETE",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/expenses/{{expense_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "expenses",
+                                "{{expense_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Generate Split",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Idempotency-Key",
+                                "value": "{{$guid}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/split",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "split"
+                            ]
+                        },
+                        "description": "Calculate equal split and create obligations"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  const response = pm.response.json();",
+                                    "  if (response.data?.obligations?.length > 0) {",
+                                    "    pm.collectionVariables.set('obligation_id', response.data.obligations[0].id || '');",
+                                    "  }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Obligations",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/obligations",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "obligations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Payment (Approve)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"action\": \"approve\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/obligations/{{obligation_id}}/verify",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "obligations",
+                                "{{obligation_id}}",
+                                "verify"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Payment (Reject)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"action\": \"reject\",\n  \"rejectionReason\": \"Amount doesn't match\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/obligations/{{obligation_id}}/verify",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "obligations",
+                                "{{obligation_id}}",
+                                "verify"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Send Reminder",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/obligations/{{obligation_id}}/remind",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "obligations",
+                                "{{obligation_id}}",
+                                "remind"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Close Session",
+                    "request": {
+                        "method": "POST",
+                        "url": {
+                            "raw": "{{baseUrl}}/sessions/{{session_id}}/close",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sessions",
+                                "{{session_id}}",
+                                "close"
+                            ]
+                        },
+                        "description": "Close session when all payments verified"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Players",
+            "description": "Player payment operations",
+            "item": [
+                {
+                    "name": "Get My Profile",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/player/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "me"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Sessions",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/player/sessions?status=all",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "sessions"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "all"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Obligations",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/player/obligations?status=all",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "obligations"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "all"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Obligation Details",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/player/obligations/{{obligation_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "obligations",
+                                "{{obligation_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Mark as Paid",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"method\": \"TRANSFER\",\n  \"referenceNumber\": \"TRX123456\",\n  \"notes\": \"Paid via BCA\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/player/obligations/{{obligation_id}}/pay",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "obligations",
+                                "{{obligation_id}}",
+                                "pay"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  const response = pm.response.json();",
+                                    "  pm.collectionVariables.set('payment_id', response.data?.paymentId || '');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Upload Payment Proof",
+                    "request": {
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "proof",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/player/payments/{{payment_id}}/proof",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "payments",
+                                "{{payment_id}}",
+                                "proof"
+                            ]
+                        },
+                        "description": "Upload payment screenshot/receipt"
+                    }
+                },
+                {
+                    "name": "Get Payment Status",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/player/payments/{{payment_id}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "payments",
+                                "{{payment_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Resubmit Payment Proof",
+                    "request": {
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "proof",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/player/payments/{{payment_id}}/proof/resubmit",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "payments",
+                                "{{payment_id}}",
+                                "proof",
+                                "resubmit"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Enroll Face",
+                    "request": {
+                        "method": "POST",
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "photo",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/player/face/enroll",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "player",
+                                "face",
+                                "enroll"
+                            ]
+                        },
+                        "description": "Enroll face for future detection"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,354 @@
+{
+  "info": {
+    "name": "Session Routes",
+    "description": "Bill splitting session management endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Badminton Pemogan\",\n  \"description\": \"Sunday morning session\",\n  \"date\": \"2025-07-26T00:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get My Sessions",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/sessions?role=all&status=all",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Session Details",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Session",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Badminton Pemogan Updated\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Session",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add Players",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"players\": [\n    { \"name\": \"Jessica\", \"email\": \"jessica@example.com\" },\n    { \"name\": \"James\" },\n    { \"name\": \"Jason\" },\n    { \"name\": \"Jeremy\" }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/players",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "players"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Remove Player",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/players/{{player_id}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "players",
+            "{{player_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Upload Group Photo",
+      "request": {
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "photo",
+              "type": "file",
+              "src": ""
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/photo",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "photo"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Face Detection Results",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/faces",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "faces"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Confirm Face Mappings",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"confirmations\": [\n    { \"detectedFaceId\": \"uuid\", \"playerId\": \"{{player_id}}\" }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/faces/confirm",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "faces",
+            "confirm"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add Expense Items",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"items\": [\n    { \"description\": \"Court\", \"amount\": 60000, \"quantity\": 2 },\n    { \"description\": \"Shuttlecock\", \"amount\": 15000, \"quantity\": 1 }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/expenses",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "expenses"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Expense Summary",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/expenses",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "expenses"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Generate Split",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Idempotency-Key",
+            "value": "{{$guid}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/split",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "split"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Obligations",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/obligations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "obligations"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Verify Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"action\": \"approve\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/obligations/{{obligation_id}}/verify",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "obligations",
+            "{{obligation_id}}",
+            "verify"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Close Session",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/sessions/{{session_id}}/close",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "sessions",
+            "{{session_id}}",
+            "close"
+          ]
+        }
+      }
+    }
+  ]
+}

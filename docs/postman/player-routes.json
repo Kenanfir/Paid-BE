@@ -1,0 +1,203 @@
+{
+    "info": {
+        "name": "Player Routes",
+        "description": "Player payment operations endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Get My Profile",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/player/me",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "me"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get My Sessions",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/player/sessions?status=all",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "sessions"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get My Obligations",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/player/obligations?status=all",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "obligations"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Obligation Details",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/player/obligations/{{obligation_id}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "obligations",
+                        "{{obligation_id}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Mark as Paid",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"method\": \"TRANSFER\",\n  \"referenceNumber\": \"TRX123456\",\n  \"notes\": \"Paid via BCA\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/player/obligations/{{obligation_id}}/pay",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "obligations",
+                        "{{obligation_id}}",
+                        "pay"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Upload Payment Proof",
+            "request": {
+                "method": "POST",
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "proof",
+                            "type": "file",
+                            "src": ""
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/player/payments/{{payment_id}}/proof",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "payments",
+                        "{{payment_id}}",
+                        "proof"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Payment Status",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{baseUrl}}/player/payments/{{payment_id}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "payments",
+                        "{{payment_id}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Resubmit Payment Proof",
+            "request": {
+                "method": "POST",
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "proof",
+                            "type": "file",
+                            "src": ""
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/player/payments/{{payment_id}}/proof/resubmit",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "payments",
+                        "{{payment_id}}",
+                        "proof",
+                        "resubmit"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Enroll Face",
+            "request": {
+                "method": "POST",
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "photo",
+                            "type": "file",
+                            "src": ""
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/player/face/enroll",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "player",
+                        "face",
+                        "enroll"
+                    ]
+                }
+            }
+        }
+    ]
+}
