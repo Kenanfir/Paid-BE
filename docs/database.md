@@ -262,6 +262,9 @@ erDiagram
 | `name` | `varchar(255)` | NO | - | Display name |
 | `phone` | `varchar(50)` | YES | - | Phone number |
 | `photo_url` | `text` | YES | - | Profile photo URL |
+| `bank_name` | `varchar(100)` | YES | - | Bank name for payment transfers |
+| `bank_account_number` | `varchar(50)` | YES | - | Bank account number |
+| `bank_account_name` | `varchar(255)` | YES | - | Bank account holder name |
 | `is_active` | `boolean` | NO | `true` | Soft delete flag |
 | `deleted_at` | `timestamptz` | YES | - | Soft delete timestamp |
 | `created_at` | `timestamptz` | NO | `now()` | Record creation time |

@@ -79,6 +79,11 @@ export const getMyProfile = async (
       name: user.name,
       phone: user.phone,
       photoUrl: user.photoUrl,
+      bankAccount: user.bankName ? {
+        bankName: user.bankName,
+        accountNumber: user.bankAccountNumber,
+        accountName: user.bankAccountName,
+      } : null,
       createdAt: user.createdAt,
       stats: {
         sessionsHosted,
@@ -103,7 +108,7 @@ export const updateMyProfile = async (
 ): Promise<void> => {
   try {
     const userId = req.userId;
-    const { name, phone, photoUrl } = req.body as UserProfileUpdateInput;
+    const { name, phone, photoUrl, bankName, bankAccountNumber, bankAccountName } = req.body as UserProfileUpdateInput;
 
     if (!userId) {
       sendError(res, "Authentication required", [], 401);
@@ -116,6 +121,9 @@ export const updateMyProfile = async (
         ...(name && { name }),
         ...(phone !== undefined && { phone }),
         ...(photoUrl !== undefined && { photoUrl }),
+        ...(bankName !== undefined && { bankName }),
+        ...(bankAccountNumber !== undefined && { bankAccountNumber }),
+        ...(bankAccountName !== undefined && { bankAccountName }),
       },
     });
 
@@ -135,6 +143,11 @@ export const updateMyProfile = async (
       name: updated.name,
       phone: updated.phone,
       photoUrl: updated.photoUrl,
+      bankAccount: updated.bankName ? {
+        bankName: updated.bankName,
+        accountNumber: updated.bankAccountNumber,
+        accountName: updated.bankAccountName,
+      } : null,
     });
   } catch (error) {
     console.error("Update user profile error:", error);

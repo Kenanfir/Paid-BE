@@ -146,7 +146,12 @@ All session endpoints use the base path: `/api/sessions`
     "host": {
       "id": "uuid",
       "name": "Felly",
-      "photoUrl": "string|null"
+      "photoUrl": "string|null",
+      "bankAccount": {
+        "bankName": "BCA",
+        "accountNumber": "1234567890",
+        "accountName": "Felly"
+      } | null
     },
     "players": [
       {

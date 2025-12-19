@@ -31,6 +31,11 @@ All user endpoints use the base path: `/api/users`
     "name": "Felly",
     "phone": "+62811111111",
     "photoUrl": "string|null",
+    "bankAccount": {
+      "bankName": "BCA",
+      "accountNumber": "1234567890",
+      "accountName": "Felly"
+    } | null,
     "createdAt": "datetime",
     "stats": {
       "sessionsHosted": 15,
@@ -59,7 +64,10 @@ All user endpoints use the base path: `/api/users`
 {
   "name": "string|optional",
   "phone": "string|optional",
-  "photoUrl": "string|optional"
+  "photoUrl": "string|optional",
+  "bankName": "string|optional",
+  "bankAccountNumber": "string|optional",
+  "bankAccountName": "string|optional"
 }
 ```
 
@@ -72,7 +80,12 @@ All user endpoints use the base path: `/api/users`
     "email": "felly@example.com",
     "name": "Felly",
     "phone": "+62811111111",
-    "photoUrl": "string|null"
+    "photoUrl": "string|null",
+    "bankAccount": {
+      "bankName": "BCA",
+      "accountNumber": "1234567890",
+      "accountName": "Felly"
+    } | null
   }
 }
 ```

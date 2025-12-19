@@ -8,6 +8,9 @@ export interface UserProfileUpdateInput {
   name?: string;
   phone?: string;
   photoUrl?: string;
+  bankName?: string;
+  bankAccountNumber?: string;
+  bankAccountName?: string;
 }
 
 export interface ChangePasswordInput {

@@ -260,7 +260,7 @@ export const getSessionDetails = async (
     const session = await prisma.session.findUnique({
       where: { id: sessionId, isActive: true },
       include: {
-        host: { select: { id: true, name: true, photoUrl: true } },
+        host: { select: { id: true, name: true, photoUrl: true, bankName: true, bankAccountNumber: true, bankAccountName: true } },
         participants: {
           where: { isActive: true },
           include: { player: true },
@@ -330,6 +330,11 @@ export const getSessionDetails = async (
         id: session.host.id,
         name: session.host.name,
         photoUrl: session.host.photoUrl,
+        bankAccount: session.host.bankName ? {
+          bankName: session.host.bankName,
+          accountNumber: session.host.bankAccountNumber,
+          accountName: session.host.bankAccountName,
+        } : null,
       },
       players: playersWithPayment,
       expenses: session.expenseItems.map((e) => ({

@@ -73,16 +73,20 @@ enum VerificationStatus {
 
 /// Registered app users who can host sessions
 model User {
-  id            String    @id @default(uuid()) @db.Uuid
-  email         String    @unique @db.VarChar(255)
-  passwordHash  String?   @map("password_hash") @db.VarChar(255)
-  name          String    @db.VarChar(255)
-  phone         String?   @db.VarChar(50)
-  photoUrl      String?   @map("photo_url")
-  isActive      Boolean   @default(true) @map("is_active")
-  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  id                String    @id @default(uuid()) @db.Uuid
+  email             String    @unique @db.VarChar(255)
+  passwordHash      String?   @map("password_hash") @db.VarChar(255)
+  name              String    @db.VarChar(255)
+  phone             String?   @db.VarChar(50)
+  photoUrl          String?   @map("photo_url")
+  // Bank account info for receiving payments
+  bankName          String?   @map("bank_name") @db.VarChar(100)
+  bankAccountNumber String?   @map("bank_account_number") @db.VarChar(50)
+  bankAccountName   String?   @map("bank_account_name") @db.VarChar(255)
+  isActive          Boolean   @default(true) @map("is_active")
+  deletedAt         DateTime? @map("deleted_at") @db.Timestamptz
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations
   sessions           Session[]          @relation("HostedSessions")

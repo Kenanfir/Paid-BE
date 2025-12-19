@@ -15,6 +15,22 @@ export const updateUserProfileValidation = [
     .isMobilePhone("any")
     .withMessage("Invalid phone number format"),
   body("photoUrl").optional().isURL().withMessage("Invalid photo URL format"),
+  // Bank account fields
+  body("bankName")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Bank name must be at most 100 characters"),
+  body("bankAccountNumber")
+    .optional()
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage("Account number must be at most 50 characters"),
+  body("bankAccountName")
+    .optional()
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage("Account holder name must be at most 255 characters"),
 ];
 
 // =====================================
