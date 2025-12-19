@@ -43,12 +43,14 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
-# Install production dependencies and Prisma CLI
+# Install production dependencies and Prisma CLI and tsx for running TypeScript
 RUN pnpm install --prod --frozen-lockfile && \
-    pnpm add -D prisma
+    pnpm add -D prisma tsx
 
-# Copy built assets from builder stage
+# Copy built assets and source from builder stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 # Use shell to handle errors for copying Prisma files
 RUN mkdir -p ./node_modules/.pnpm/
