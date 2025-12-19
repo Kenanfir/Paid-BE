@@ -1,11 +1,11 @@
 {
-  "name": "challenge4-backend",
+  "name": "paid-backend",
   "version": "1.0.0",
   "type": "module",
   "description": "Backend API for Challenge",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/src/server.js",
+    "start": "tsx src/server.ts",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
