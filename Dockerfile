@@ -59,7 +59,7 @@ RUN mkdir -p ./node_modules/.prisma/
 RUN pnpm prisma:generate
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 3100
 
 # Command to run the application
 CMD ["pnpm", "start"]
