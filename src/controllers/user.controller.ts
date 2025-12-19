@@ -1,13 +1,13 @@
 // User Controller - User management endpoints
-import { Request, Response } from 'express';
-import { PrismaClient, SessionStatus, ObligationStatus } from '@prisma/client';
-import { sendSuccess, sendError } from '../utils/response';
-import { hashPassword, comparePassword } from '../utils/password';
+import { Response } from "express";
+import { PrismaClient, SessionStatus, ObligationStatus } from "@prisma/client";
+import { sendSuccess, sendError } from "../utils/response";
+import { hashPassword, comparePassword } from "../utils/password";
 import {
   AuthenticatedRequest,
   UserProfileUpdateInput,
   ChangePasswordInput,
-} from '../types';
+} from "../types";
 
 const prisma = new PrismaClient();
 
@@ -15,12 +15,15 @@ const prisma = new PrismaClient();
 // Get My Profile
 // GET /api/users/me
 // =====================================
-export const getMyProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getMyProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [], 401);
+      sendError(res, "Authentication required", [], 401);
       return;
     }
 
@@ -50,7 +53,7 @@ export const getMyProfile = async (req: AuthenticatedRequest, res: Response): Pr
     });
 
     if (!user) {
-      sendError(res, 'User not found', [], 404);
+      sendError(res, "User not found", [], 404);
       return;
     }
 
@@ -63,12 +66,14 @@ export const getMyProfile = async (req: AuthenticatedRequest, res: Response): Pr
       return sum + verified;
     }, 0);
 
-    const sessionsParticipated = user.linkedPlayer?.sessionParticipants.length || 0;
-    const totalPaid = user.linkedPlayer?.obligationsAsPayer
-      .filter((o) => o.status === ObligationStatus.VERIFIED)
-      .reduce((sum, o) => sum + Number(o.amount), 0) || 0;
+    const sessionsParticipated =
+      user.linkedPlayer?.sessionParticipants.length || 0;
+    const totalPaid =
+      user.linkedPlayer?.obligationsAsPayer
+        .filter((o) => o.status === ObligationStatus.VERIFIED)
+        .reduce((sum, o) => sum + Number(o.amount), 0) || 0;
 
-    sendSuccess(res, 'Profile retrieved successfully', {
+    sendSuccess(res, "Profile retrieved successfully", {
       id: user.id,
       email: user.email,
       name: user.name,
@@ -83,8 +88,8 @@ export const getMyProfile = async (req: AuthenticatedRequest, res: Response): Pr
       },
     });
   } catch (error) {
-    console.error('Get user profile error:', error);
-    sendError(res, 'Failed to retrieve profile', [], 500);
+    console.error("Get user profile error:", error);
+    sendError(res, "Failed to retrieve profile", [], 500);
   }
 };
 
@@ -92,13 +97,16 @@ export const getMyProfile = async (req: AuthenticatedRequest, res: Response): Pr
 // Update My Profile
 // PUT /api/users/me
 // =====================================
-export const updateMyProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const updateMyProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
     const { name, phone, photoUrl } = req.body as UserProfileUpdateInput;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [], 401);
+      sendError(res, "Authentication required", [], 401);
       return;
     }
 
@@ -121,7 +129,7 @@ export const updateMyProfile = async (req: AuthenticatedRequest, res: Response):
       },
     });
 
-    sendSuccess(res, 'Profile updated successfully', {
+    sendSuccess(res, "Profile updated successfully", {
       id: updated.id,
       email: updated.email,
       name: updated.name,
@@ -129,8 +137,8 @@ export const updateMyProfile = async (req: AuthenticatedRequest, res: Response):
       photoUrl: updated.photoUrl,
     });
   } catch (error) {
-    console.error('Update user profile error:', error);
-    sendError(res, 'Failed to update profile', [], 500);
+    console.error("Update user profile error:", error);
+    sendError(res, "Failed to update profile", [], 500);
   }
 };
 
@@ -138,22 +146,25 @@ export const updateMyProfile = async (req: AuthenticatedRequest, res: Response):
 // Upload Profile Photo (Placeholder)
 // POST /api/users/me/photo
 // =====================================
-export const uploadProfilePhoto = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const uploadProfilePhoto = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [], 401);
+      sendError(res, "Authentication required", [], 401);
       return;
     }
 
     // TODO: Implement file upload
-    sendSuccess(res, 'Photo uploaded successfully', {
-      photoUrl: 'placeholder-url',
+    sendSuccess(res, "Photo uploaded successfully", {
+      photoUrl: "placeholder-url",
     });
   } catch (error) {
-    console.error('Upload photo error:', error);
-    sendError(res, 'Failed to upload photo', [], 500);
+    console.error("Upload photo error:", error);
+    sendError(res, "Failed to upload photo", [], 500);
   }
 };
 
@@ -161,13 +172,20 @@ export const uploadProfilePhoto = async (req: AuthenticatedRequest, res: Respons
 // Get My Sessions (as Host)
 // GET /api/users/me/sessions
 // =====================================
-export const getMySessions = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getMySessions = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
-    const { status = 'all', page = '1', limit = '10' } = req.query as Record<string, string>;
+    const {
+      status = "all",
+      page = "1",
+      limit = "10",
+    } = req.query as Record<string, string>;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [], 401);
+      sendError(res, "Authentication required", [], 401);
       return;
     }
 
@@ -180,7 +198,7 @@ export const getMySessions = async (req: AuthenticatedRequest, res: Response): P
       isActive: true,
     };
 
-    if (status !== 'all') {
+    if (status !== "all") {
       whereClause.status = status as SessionStatus;
     }
 
@@ -193,7 +211,7 @@ export const getMySessions = async (req: AuthenticatedRequest, res: Response): P
         },
         skip,
         take: limitNum,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       prisma.session.count({ where: whereClause }),
     ]);
@@ -208,11 +226,13 @@ export const getMySessions = async (req: AuthenticatedRequest, res: Response): P
       totalAmount: session.totalAmount ? Number(session.totalAmount) : null,
       playerCount: session.participants.length,
       pendingPayments: session.obligations.filter(
-        (o) => o.status === ObligationStatus.PENDING || o.status === ObligationStatus.MARKED_PAID
+        (o) =>
+          o.status === ObligationStatus.PENDING ||
+          o.status === ObligationStatus.MARKED_PAID,
       ).length,
     }));
 
-    sendSuccess(res, 'Sessions retrieved successfully', {
+    sendSuccess(res, "Sessions retrieved successfully", {
       items,
       pagination: {
         currentPage: pageNum,
@@ -224,8 +244,8 @@ export const getMySessions = async (req: AuthenticatedRequest, res: Response): P
       },
     });
   } catch (error) {
-    console.error('Get user sessions error:', error);
-    sendError(res, 'Failed to retrieve sessions', [], 500);
+    console.error("Get user sessions error:", error);
+    sendError(res, "Failed to retrieve sessions", [], 500);
   }
 };
 
@@ -233,12 +253,15 @@ export const getMySessions = async (req: AuthenticatedRequest, res: Response): P
 // Get Payment Summary
 // GET /api/users/me/summary
 // =====================================
-export const getPaymentSummary = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getPaymentSummary = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [], 401);
+      sendError(res, "Authentication required", [], 401);
       return;
     }
 
@@ -250,7 +273,7 @@ export const getPaymentSummary = async (req: AuthenticatedRequest, res: Response
 
     const totalHostedSessions = hostedSessions.length;
     const activeSessions = hostedSessions.filter(
-      (s) => s.status !== SessionStatus.CLOSED
+      (s) => s.status !== SessionStatus.CLOSED,
     ).length;
 
     const asHostStats = hostedSessions.reduce(
@@ -267,7 +290,7 @@ export const getPaymentSummary = async (req: AuthenticatedRequest, res: Response
           pending: acc.pending + pending,
         };
       },
-      { totalCollected: 0, pending: 0 }
+      { totalCollected: 0, pending: 0 },
     );
 
     // Get player obligations
@@ -281,15 +304,17 @@ export const getPaymentSummary = async (req: AuthenticatedRequest, res: Response
 
     const asPlayerStats = {
       totalSessions: player?.sessionParticipants.length || 0,
-      totalPaid: player?.obligationsAsPayer
-        .filter((o) => o.status === ObligationStatus.VERIFIED)
-        .reduce((sum, o) => sum + Number(o.amount), 0) || 0,
-      pending: player?.obligationsAsPayer
-        .filter((o) => o.status !== ObligationStatus.VERIFIED)
-        .reduce((sum, o) => sum + Number(o.amount), 0) || 0,
+      totalPaid:
+        player?.obligationsAsPayer
+          .filter((o) => o.status === ObligationStatus.VERIFIED)
+          .reduce((sum, o) => sum + Number(o.amount), 0) || 0,
+      pending:
+        player?.obligationsAsPayer
+          .filter((o) => o.status !== ObligationStatus.VERIFIED)
+          .reduce((sum, o) => sum + Number(o.amount), 0) || 0,
     };
 
-    sendSuccess(res, 'Summary retrieved successfully', {
+    sendSuccess(res, "Summary retrieved successfully", {
       asHost: {
         totalSessions: totalHostedSessions,
         totalCollected: asHostStats.totalCollected,
@@ -299,8 +324,8 @@ export const getPaymentSummary = async (req: AuthenticatedRequest, res: Response
       asPlayer: asPlayerStats,
     });
   } catch (error) {
-    console.error('Get payment summary error:', error);
-    sendError(res, 'Failed to retrieve summary', [], 500);
+    console.error("Get payment summary error:", error);
+    sendError(res, "Failed to retrieve summary", [], 500);
   }
 };
 
@@ -308,13 +333,16 @@ export const getPaymentSummary = async (req: AuthenticatedRequest, res: Response
 // Change Password
 // POST /api/users/me/password
 // =====================================
-export const changePassword = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const changePassword = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
     const { currentPassword, newPassword } = req.body as ChangePasswordInput;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [], 401);
+      sendError(res, "Authentication required", [], 401);
       return;
     }
 
@@ -323,16 +351,24 @@ export const changePassword = async (req: AuthenticatedRequest, res: Response): 
     });
 
     if (!user || !user.passwordHash) {
-      sendError(res, 'User not found', [], 404);
+      sendError(res, "User not found", [], 404);
       return;
     }
 
     // Verify current password
     const isValid = await comparePassword(currentPassword, user.passwordHash);
     if (!isValid) {
-      sendError(res, 'Invalid password', [
-        { field: 'currentPassword', message: 'Current password is incorrect' },
-      ], 400);
+      sendError(
+        res,
+        "Invalid password",
+        [
+          {
+            field: "currentPassword",
+            message: "Current password is incorrect",
+          },
+        ],
+        400,
+      );
       return;
     }
 
@@ -344,10 +380,10 @@ export const changePassword = async (req: AuthenticatedRequest, res: Response): 
       data: { passwordHash: newPasswordHash },
     });
 
-    sendSuccess(res, 'Password changed successfully', null);
+    sendSuccess(res, "Password changed successfully", null);
   } catch (error) {
-    console.error('Change password error:', error);
-    sendError(res, 'Failed to change password', [], 500);
+    console.error("Change password error:", error);
+    sendError(res, "Failed to change password", [], 500);
   }
 };
 
@@ -355,12 +391,15 @@ export const changePassword = async (req: AuthenticatedRequest, res: Response): 
 // Delete Account
 // DELETE /api/users/me
 // =====================================
-export const deleteAccount = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const deleteAccount = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [], 401);
+      sendError(res, "Authentication required", [], 401);
       return;
     }
 
@@ -378,15 +417,22 @@ export const deleteAccount = async (req: AuthenticatedRequest, res: Response): P
       },
     });
 
-    const sessionsWithPending = activeSessions.filter((s) => s.obligations.length > 0);
+    const sessionsWithPending = activeSessions.filter(
+      (s) => s.obligations.length > 0,
+    );
 
     if (sessionsWithPending.length > 0) {
-      sendError(res, 'Cannot delete account', [
-        {
-          field: 'sessions',
-          message: `You have ${sessionsWithPending.length} active sessions with pending payments`,
-        },
-      ], 400);
+      sendError(
+        res,
+        "Cannot delete account",
+        [
+          {
+            field: "sessions",
+            message: `You have ${sessionsWithPending.length} active sessions with pending payments`,
+          },
+        ],
+        400,
+      );
       return;
     }
 
@@ -402,9 +448,9 @@ export const deleteAccount = async (req: AuthenticatedRequest, res: Response): P
       data: { isActive: false, deletedAt: new Date() },
     });
 
-    sendSuccess(res, 'Account deleted successfully', null);
+    sendSuccess(res, "Account deleted successfully", null);
   } catch (error) {
-    console.error('Delete account error:', error);
-    sendError(res, 'Failed to delete account', [], 500);
+    console.error("Delete account error:", error);
+    sendError(res, "Failed to delete account", [], 500);
   }
 };

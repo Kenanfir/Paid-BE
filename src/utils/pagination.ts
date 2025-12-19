@@ -6,7 +6,7 @@ export interface PaginationQuery {
   limit?: string;
   search?: string;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 /**
@@ -21,21 +21,21 @@ export const DEFAULT_LIMIT = 10;
  * @returns Parsed pagination parameters
  */
 export const parsePagination = (
-  query: PaginationQuery
+  query: PaginationQuery,
 ): {
   page: number;
   limit: number;
   skip: number;
   search?: string;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 } => {
   const page = Math.max(1, Number(query.page) || DEFAULT_PAGE);
   const limitValue =
     query.limit !== undefined ? Number(query.limit) : DEFAULT_LIMIT;
   const limit = Math.max(
     1,
-    Math.min(100, isNaN(limitValue) ? DEFAULT_LIMIT : limitValue)
+    Math.min(100, isNaN(limitValue) ? DEFAULT_LIMIT : limitValue),
   );
   const skip = (page - 1) * limit;
 
@@ -61,7 +61,7 @@ export const createPaginatedResponse = <T>(
   data: T[],
   totalData: number,
   page: number,
-  limit: number
+  limit: number,
 ) => {
   const totalPages = Math.ceil(totalData / limit);
   return {

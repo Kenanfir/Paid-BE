@@ -1,11 +1,11 @@
-import jwt from 'jsonwebtoken';
-import { env } from '../config/environment';
+import jwt from "jsonwebtoken";
+import { env } from "../config/environment";
 
 // Token payload types
 export interface TokenPayload {
   id?: string;
   email?: string;
-  type: 'user' | 'player' | 'magic_link';
+  type: "user" | "player" | "magic_link";
   playerId?: string;
   purpose?: string;
   iat?: number;
@@ -17,7 +17,9 @@ export interface TokenPayload {
  * @param payload The payload to encode in the token
  * @returns The generated JWT token
  */
-export const generateToken = (payload: Omit<TokenPayload, 'iat' | 'exp'>): string => {
+export const generateToken = (
+  payload: Omit<TokenPayload, "iat" | "exp">,
+): string => {
   return jwt.sign(payload as object, env.JWT_SECRET, {
     expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
   });
@@ -30,8 +32,8 @@ export const generateToken = (payload: Omit<TokenPayload, 'iat' | 'exp'>): strin
  * @returns The generated JWT token
  */
 export const generateMagicLinkToken = (
-  payload: Omit<TokenPayload, 'iat' | 'exp'>,
-  expiresInHours = 24
+  payload: Omit<TokenPayload, "iat" | "exp">,
+  expiresInHours = 24,
 ): string => {
   return jwt.sign(payload as object, env.JWT_SECRET, {
     expiresIn: 60 * 60 * expiresInHours,
@@ -48,7 +50,7 @@ export const verifyToken = (token: string): TokenPayload | null => {
     const decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
     return decoded;
   } catch (error) {
-    console.error('Token verification error:', error);
+    console.error("Token verification error:", error);
     return null;
   }
 };
@@ -59,7 +61,7 @@ export const verifyToken = (token: string): TokenPayload | null => {
  * @returns The token if present and valid, null otherwise
  */
 export const extractTokenFromHeader = (authHeader?: string): string | null => {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return null;
   }
 

@@ -1,5 +1,5 @@
-import { Response } from 'express';
-import { ApiResponse, ApiErrorDetail } from '../types';
+import { Response } from "express";
+import { ApiResponse, ApiErrorDetail } from "../types";
 
 /**
  * Send a success response
@@ -12,7 +12,7 @@ export const sendSuccess = <T>(
   res: Response,
   message: string,
   data: T,
-  statusCode = 200
+  statusCode = 200,
 ): void => {
   const response: ApiResponse<T> = {
     message,
@@ -33,7 +33,7 @@ export const sendError = (
   res: Response,
   message: string,
   errors: ApiErrorDetail[] = [],
-  statusCode = 400
+  statusCode = 400,
 ): void => {
   const response = {
     error: message,

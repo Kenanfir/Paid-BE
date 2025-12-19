@@ -97,6 +97,8 @@ All session endpoints use the base path: `/api/sessions`
         "status": "DRAFT",
         "totalAmount": 135000,
         "playerCount": 5,
+        "paidCount": 2,
+        "totalObligations": 4,
         "myRole": "HOST",
         "host": {
           "id": "uuid",
@@ -151,13 +153,23 @@ All session endpoints use the base path: `/api/sessions`
         "id": "uuid",
         "name": "Felly",
         "photoUrl": "string|null",
-        "role": "HOST"
+        "role": "HOST",
+        "email": "string|null",
+        "phone": "string|null",
+        "paymentStatus": null,
+        "amountOwed": null,
+        "obligationId": null
       },
       {
         "id": "uuid",
         "name": "Jessica",
         "photoUrl": "string|null",
-        "role": "PLAYER"
+        "role": "PLAYER",
+        "email": "jessica@example.com",
+        "phone": "+62812345678",
+        "paymentStatus": "PENDING",
+        "amountOwed": 27000,
+        "obligationId": "uuid"
       }
     ],
     "expenses": [
@@ -177,7 +189,9 @@ All session endpoints use the base path: `/api/sessions`
       }
     ],
     "totalAmount": 135000,
-    "perPersonAmount": 27000
+    "perPersonAmount": 27000,
+    "paidCount": 2,
+    "totalObligations": 4
   }
 }
 ```
@@ -519,6 +533,38 @@ All session endpoints use the base path: `/api/sessions`
   "rejectionReason": "string|null"
 }
 ```
+
+---
+
+### 17b. Mark Player as Paid (Host Quick Action)
+
+**Endpoint:** `POST /api/sessions/{sessionId}/players/{playerId}/mark-paid`
+
+**Description:** Marks a player as paid directly. Creates an obligation if one doesn't exist and marks it as VERIFIED. This is a convenience endpoint for hosts to quickly mark players as paid without needing to go through the obligation flow.
+
+**Headers:**
+- `Authorization: Bearer <token>` (required - must be session host)
+
+**Path Parameters:**
+- `sessionId` - Session UUID
+- `playerId` - Player UUID (from session players list)
+
+**Response (Success - 200):**
+```json
+{
+  "message": "Player marked as paid",
+  "data": {
+    "obligationId": "uuid",
+    "status": "VERIFIED",
+    "amount": 27000
+  }
+}
+```
+
+**Error Responses:**
+- `403` - Only the host can mark players as paid
+- `400` - Cannot mark host as paid - they do not owe
+- `404` - Player not found in session
 
 ---
 

@@ -1,12 +1,12 @@
 // Types index file - re-exports all types
-import { Request } from 'express';
-import { User, Player } from '@prisma/client';
+import { Request } from "express";
+import { User, Player } from "@prisma/client";
 
 // Re-export all types
-export * from './auth.types';
-export * from './session.types';
-export * from './player.types';
-export * from './user.types';
+export * from "./auth.types";
+export * from "./session.types";
+export * from "./player.types";
+export * from "./user.types";
 
 // =====================================
 // Common Types
@@ -59,4 +59,5 @@ export interface PlayerAuthenticatedRequest extends Request {
 // Utility Types
 // =====================================
 
-export type OptionalExceptFor<T, TRequired extends keyof T> = Partial<T> & Pick<T, TRequired>;
+export type OptionalExceptFor<T, TRequired extends keyof T> = Partial<T> &
+  Pick<T, TRequired>;

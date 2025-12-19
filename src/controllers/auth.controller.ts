@@ -1,17 +1,17 @@
 // Auth Controller - Authentication endpoints
-import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import crypto from 'crypto';
-import { sendSuccess, sendError } from '../utils/response';
-import { hashPassword, comparePassword } from '../utils/password';
-import { generateToken } from '../utils/token';
+import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import crypto from "crypto";
+import { sendSuccess, sendError } from "../utils/response";
+import { hashPassword, comparePassword } from "../utils/password";
+import { generateToken } from "../utils/token";
 import {
   RegisterInput,
   LoginInput,
   MagicLinkGenerateInput,
   MagicLinkVerifyInput,
   AuthenticatedRequest,
-} from '../types';
+} from "../types";
 
 const prisma = new PrismaClient();
 
@@ -29,9 +29,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (existingUser) {
-      sendError(res, 'Registration failed', [
-        { field: 'email', message: 'Email already in use' },
-      ], 400);
+      sendError(
+        res,
+        "Registration failed",
+        [{ field: "email", message: "Email already in use" }],
+        400,
+      );
       return;
     }
 
@@ -59,26 +62,38 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     // Generate token
-    const token = generateToken({ id: user.id, email: user.email, type: 'user' });
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      type: "user",
+    });
 
-    sendSuccess(res, 'User registered successfully', {
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        photoUrl: user.photoUrl,
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+    sendSuccess(
+      res,
+      "User registered successfully",
+      {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          photoUrl: user.photoUrl,
+          isActive: user.isActive,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+        token,
       },
-      token,
-    }, 201);
+      201,
+    );
   } catch (error) {
-    console.error('Register error:', error);
-    sendError(res, 'Registration failed', [
-      { field: 'server', message: 'An error occurred during registration' },
-    ], 500);
+    console.error("Register error:", error);
+    sendError(
+      res,
+      "Registration failed",
+      [{ field: "server", message: "An error occurred during registration" }],
+      500,
+    );
   }
 };
 
@@ -96,9 +111,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (!user || !user.passwordHash) {
-      sendError(res, 'Login failed', [
-        { field: 'credentials', message: 'Invalid email or password' },
-      ], 401);
+      sendError(
+        res,
+        "Login failed",
+        [{ field: "credentials", message: "Invalid email or password" }],
+        401,
+      );
       return;
     }
 
@@ -106,16 +124,23 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const isValidPassword = await comparePassword(password, user.passwordHash);
 
     if (!isValidPassword) {
-      sendError(res, 'Login failed', [
-        { field: 'credentials', message: 'Invalid email or password' },
-      ], 401);
+      sendError(
+        res,
+        "Login failed",
+        [{ field: "credentials", message: "Invalid email or password" }],
+        401,
+      );
       return;
     }
 
     // Generate token
-    const token = generateToken({ id: user.id, email: user.email, type: 'user' });
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      type: "user",
+    });
 
-    sendSuccess(res, 'Login successful', {
+    sendSuccess(res, "Login successful", {
       user: {
         id: user.id,
         email: user.email,
@@ -129,10 +154,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       token,
     });
   } catch (error) {
-    console.error('Login error:', error);
-    sendError(res, 'Login failed', [
-      { field: 'server', message: 'An error occurred during login' },
-    ], 500);
+    console.error("Login error:", error);
+    sendError(
+      res,
+      "Login failed",
+      [{ field: "server", message: "An error occurred during login" }],
+      500,
+    );
   }
 };
 
@@ -140,14 +168,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 // Get Profile
 // GET /api/auth/profile
 // =====================================
-export const getProfile = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getProfile = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [
-        { field: 'token', message: 'No token provided' },
-      ], 401);
+      sendError(
+        res,
+        "Authentication required",
+        [{ field: "token", message: "No token provided" }],
+        401,
+      );
       return;
     }
 
@@ -156,13 +190,16 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response): Prom
     });
 
     if (!user) {
-      sendError(res, 'User not found', [
-        { field: 'user', message: 'User does not exist' },
-      ], 404);
+      sendError(
+        res,
+        "User not found",
+        [{ field: "user", message: "User does not exist" }],
+        404,
+      );
       return;
     }
 
-    sendSuccess(res, 'Profile retrieved successfully', {
+    sendSuccess(res, "Profile retrieved successfully", {
       id: user.id,
       email: user.email,
       name: user.name,
@@ -173,10 +210,13 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response): Prom
       updatedAt: user.updatedAt,
     });
   } catch (error) {
-    console.error('Get profile error:', error);
-    sendError(res, 'Failed to retrieve profile', [
-      { field: 'server', message: 'An error occurred' },
-    ], 500);
+    console.error("Get profile error:", error);
+    sendError(
+      res,
+      "Failed to retrieve profile",
+      [{ field: "server", message: "An error occurred" }],
+      500,
+    );
   }
 };
 
@@ -184,15 +224,25 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response): Prom
 // Generate Magic Link (Host)
 // POST /api/auth/magic-link
 // =====================================
-export const generateMagicLink = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const generateMagicLink = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const userId = req.userId;
-    const { playerId, purpose, expiresInHours = 24 } = req.body as MagicLinkGenerateInput;
+    const {
+      playerId,
+      purpose,
+      expiresInHours = 24,
+    } = req.body as MagicLinkGenerateInput;
 
     if (!userId) {
-      sendError(res, 'Authentication required', [
-        { field: 'token', message: 'No token provided' },
-      ], 401);
+      sendError(
+        res,
+        "Authentication required",
+        [{ field: "token", message: "No token provided" }],
+        401,
+      );
       return;
     }
 
@@ -202,15 +252,21 @@ export const generateMagicLink = async (req: AuthenticatedRequest, res: Response
     });
 
     if (!player) {
-      sendError(res, 'Player not found', [
-        { field: 'playerId', message: 'Player does not exist' },
-      ], 404);
+      sendError(
+        res,
+        "Player not found",
+        [{ field: "playerId", message: "Player does not exist" }],
+        404,
+      );
       return;
     }
 
     // Generate random token
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
 
     // Calculate expiration
     const expiresAt = new Date(Date.now() + expiresInHours * 60 * 60 * 1000);
@@ -226,19 +282,22 @@ export const generateMagicLink = async (req: AuthenticatedRequest, res: Response
     });
 
     // Generate link (base URL would come from env)
-    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    const baseUrl = process.env.APP_URL || "http://localhost:3000";
     const link = `${baseUrl}/pay?token=${rawToken}`;
 
-    sendSuccess(res, 'Magic link generated successfully', {
+    sendSuccess(res, "Magic link generated successfully", {
       token: rawToken,
       expiresAt,
       link,
     });
   } catch (error) {
-    console.error('Generate magic link error:', error);
-    sendError(res, 'Failed to generate magic link', [
-      { field: 'server', message: 'An error occurred' },
-    ], 500);
+    console.error("Generate magic link error:", error);
+    sendError(
+      res,
+      "Failed to generate magic link",
+      [{ field: "server", message: "An error occurred" }],
+      500,
+    );
   }
 };
 
@@ -246,12 +305,15 @@ export const generateMagicLink = async (req: AuthenticatedRequest, res: Response
 // Verify Magic Link
 // POST /api/auth/magic-link/verify
 // =====================================
-export const verifyMagicLink = async (req: Request, res: Response): Promise<void> => {
+export const verifyMagicLink = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { token } = req.body as MagicLinkVerifyInput;
 
     // Hash the incoming token
-    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
     // Find the token
     const magicToken = await prisma.magicLinkToken.findUnique({
@@ -260,25 +322,49 @@ export const verifyMagicLink = async (req: Request, res: Response): Promise<void
     });
 
     if (!magicToken) {
-      sendError(res, 'Token verification failed', [
-        { field: 'token', message: 'Token is invalid, expired, or already used' },
-      ], 401);
+      sendError(
+        res,
+        "Token verification failed",
+        [
+          {
+            field: "token",
+            message: "Token is invalid, expired, or already used",
+          },
+        ],
+        401,
+      );
       return;
     }
 
     // Check expiration
     if (magicToken.expiresAt < new Date()) {
-      sendError(res, 'Token verification failed', [
-        { field: 'token', message: 'Token is invalid, expired, or already used' },
-      ], 401);
+      sendError(
+        res,
+        "Token verification failed",
+        [
+          {
+            field: "token",
+            message: "Token is invalid, expired, or already used",
+          },
+        ],
+        401,
+      );
       return;
     }
 
     // Check if already used
     if (magicToken.usedAt) {
-      sendError(res, 'Token verification failed', [
-        { field: 'token', message: 'Token is invalid, expired, or already used' },
-      ], 401);
+      sendError(
+        res,
+        "Token verification failed",
+        [
+          {
+            field: "token",
+            message: "Token is invalid, expired, or already used",
+          },
+        ],
+        401,
+      );
       return;
     }
 
@@ -292,10 +378,10 @@ export const verifyMagicLink = async (req: Request, res: Response): Promise<void
     const accessToken = generateToken({
       playerId: magicToken.playerId,
       purpose: magicToken.purpose,
-      type: 'magic_link',
+      type: "magic_link",
     });
 
-    sendSuccess(res, 'Token verified successfully', {
+    sendSuccess(res, "Token verified successfully", {
       player: {
         id: magicToken.player.id,
         name: magicToken.player.name,
@@ -305,9 +391,12 @@ export const verifyMagicLink = async (req: Request, res: Response): Promise<void
       purpose: magicToken.purpose,
     });
   } catch (error) {
-    console.error('Verify magic link error:', error);
-    sendError(res, 'Token verification failed', [
-      { field: 'server', message: 'An error occurred' },
-    ], 500);
+    console.error("Verify magic link error:", error);
+    sendError(
+      res,
+      "Token verification failed",
+      [{ field: "server", message: "An error occurred" }],
+      500,
+    );
   }
 };

@@ -1,5 +1,5 @@
 // Types for Authentication
-import { User, Player } from '@prisma/client';
+import { User, Player } from "@prisma/client";
 
 // =====================================
 // Request Types
@@ -19,7 +19,7 @@ export interface LoginInput {
 
 export interface MagicLinkGenerateInput {
   playerId: string;
-  purpose: 'payment' | 'view';
+  purpose: "payment" | "view";
   expiresInHours?: number;
 }
 
@@ -70,19 +70,22 @@ export interface MagicLinkVerifyResponse {
 export interface JWTPayload {
   id: string;
   email: string;
-  type: 'user' | 'player';
+  type: "user" | "player";
   playerId?: string;
 }
 
 export interface MagicLinkJWTPayload {
   playerId: string;
   purpose: string;
-  type: 'magic_link';
+  type: "magic_link";
 }
 
 // =====================================
 // Utility Types
 // =====================================
 
-export type SafeUser = Omit<User, 'passwordHash'>;
-export type SafePlayer = Pick<Player, 'id' | 'name' | 'email' | 'phone' | 'photoUrl'>;
+export type SafeUser = Omit<User, "passwordHash">;
+export type SafePlayer = Pick<
+  Player,
+  "id" | "name" | "email" | "phone" | "photoUrl"
+>;

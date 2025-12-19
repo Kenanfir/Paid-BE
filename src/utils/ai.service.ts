@@ -8,11 +8,11 @@
 // ---------- Types that match the AI service docs ----------
 
 export type QuestionType =
-  | 'MULTI_SELECT'
-  | 'FREE_TEXT'
-  | 'NUMBER'
-  | 'SCALE'
-  | 'DATE';
+  | "MULTI_SELECT"
+  | "FREE_TEXT"
+  | "NUMBER"
+  | "SCALE"
+  | "DATE";
 
 export interface AttendeeAnswer {
   question: string;
@@ -45,7 +45,7 @@ export interface ProcessAttendeeRequest {
 
 export interface ProcessAttendeeResponse {
   message: string;
-  status: 'success' | 'error';
+  status: "success" | "error";
 }
 
 export interface RecommendationItem {
@@ -96,22 +96,22 @@ class AIServiceManager {
    * and caches results to avoid duplicate calls
    */
   async getRecommendationsWithSingleton(
-    request: ProcessAttendeeRequest
+    request: ProcessAttendeeRequest,
   ): Promise<RecommendationsResponse> {
     const cacheKey = `${request.eventId}:${request.attendee.attendeeId}`;
 
     // Check cache first
     const cached = this.cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
-      log.info('Returning cached recommendations for:', cacheKey);
+      log.info("Returning cached recommendations for:", cacheKey);
       return cached.data;
     }
 
     // Check if already processing for this event
     if (this.processingEvents.has(request.eventId)) {
       log.info(
-        'Event already being processed, queuing request for:',
-        request.eventId
+        "Event already being processed, queuing request for:",
+        request.eventId,
       );
       return new Promise((resolve, reject) => {
         this.processingQueue.set(cacheKey, {
@@ -132,15 +132,15 @@ class AIServiceManager {
       const now = Date.now();
       const timeSinceLastCall = now - this.lastCallTime;
       if (timeSinceLastCall < this.rateLimitDelay) {
-        await new Promise(resolve =>
+        await new Promise((resolve) =>
           globalThis.setTimeout(
             resolve,
-            this.rateLimitDelay - timeSinceLastCall
-          )
+            this.rateLimitDelay - timeSinceLastCall,
+          ),
         );
       }
 
-      log.info('Processing AI request for event:', request.eventId);
+      log.info("Processing AI request for event:", request.eventId);
 
       // Process attendee data first
       await processAttendee(request);
@@ -160,7 +160,7 @@ class AIServiceManager {
       this.lastCallTime = Date.now();
       return recommendations;
     } catch (error) {
-      log.error('AI processing failed for event:', request.eventId, error);
+      log.error("AI processing failed for event:", request.eventId, error);
 
       // Reject any pending requests for this event
       this.rejectPendingRequests(request.eventId, error);
@@ -172,7 +172,7 @@ class AIServiceManager {
 
   private resolvePendingRequests(
     eventId: string,
-    data: RecommendationsResponse
+    data: RecommendationsResponse,
   ) {
     for (const [key, request] of this.processingQueue.entries()) {
       if (request.eventId === eventId) {
@@ -207,7 +207,7 @@ class AIServiceManager {
     // Clear old pending requests (older than 30 seconds)
     for (const [key, request] of this.processingQueue.entries()) {
       if (now - request.timestamp > 30000) {
-        request.reject(new Error('Request timeout'));
+        request.reject(new Error("Request timeout"));
         this.processingQueue.delete(key);
       }
     }
@@ -243,14 +243,14 @@ function requiredEnv(name: string): string {
  * If the provided base already ends with /api or /api/, keep it.
  */
 function normalizeBaseUrl(rawBase: string): string {
-  const base = rawBase.replace(/\/+$/, '');
-  if (base.endsWith('/api')) return base;
+  const base = rawBase.replace(/\/+$/, "");
+  if (base.endsWith("/api")) return base;
   return `${base}/api`;
 }
 
 function joinUrl(base: string, path: string): string {
-  const b = base.replace(/\/+$/, '');
-  const p = path.replace(/^\/+/, '');
+  const b = base.replace(/\/+$/, "");
+  const p = path.replace(/^\/+/, "");
   return `${b}/${p}`;
 }
 
@@ -267,10 +267,10 @@ function joinUrl(base: string, path: string): string {
 function pruneDeep<T>(value: T): T {
   if (Array.isArray(value)) {
     return value
-      .map(v => pruneDeep(v))
-      .filter(v => v !== undefined && v !== null) as unknown as T;
+      .map((v) => pruneDeep(v))
+      .filter((v) => v !== undefined && v !== null) as unknown as T;
   }
-  if (value && typeof value === 'object') {
+  if (value && typeof value === "object") {
     const entries = Object.entries(value as Record<string, any>)
       .map(([k, v]) => [k, pruneDeep(v)])
       .filter(([, v]) => v !== undefined && v !== null);
@@ -284,22 +284,22 @@ function pruneDeep<T>(value: T): T {
  * Throws with a clear message if critical fields are missing.
  */
 function normalizeProcessPayload(
-  input: ProcessAttendeeRequest
+  input: ProcessAttendeeRequest,
 ): ProcessAttendeeRequest {
-  if (!input || typeof input !== 'object') {
-    throw new Error('AI payload must be an object');
+  if (!input || typeof input !== "object") {
+    throw new Error("AI payload must be an object");
   }
   if (!input.eventId || !String(input.eventId).trim()) {
-    throw new Error('eventId is required');
+    throw new Error("eventId is required");
   }
   if (!input.attendee) {
-    throw new Error('attendee object is required');
+    throw new Error("attendee object is required");
   }
   if (!input.attendee.attendeeId || !String(input.attendee.attendeeId).trim()) {
-    throw new Error('attendee.attendeeId is required');
+    throw new Error("attendee.attendeeId is required");
   }
   if (!input.attendee.nickname || !String(input.attendee.nickname).trim()) {
-    throw new Error('attendee.nickname is required (must be a realistic name)');
+    throw new Error("attendee.nickname is required (must be a realistic name)");
   }
 
   // Strip null/undefined across the payload to avoid strict schema rejections.
@@ -311,12 +311,12 @@ function normalizeProcessPayload(
 async function postJson<TResp>(
   url: string,
   body: unknown,
-  token: string
+  token: string,
 ): Promise<TResp> {
   const res = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
@@ -334,10 +334,10 @@ async function postJson<TResp>(
     }
     log.error(
       `AI service error: ${res.status} ${res.statusText} for ${url}`,
-      parsed ?? rawText
+      parsed ?? rawText,
     );
     throw new Error(
-      `AI service request failed: ${res.status} ${res.statusText}`
+      `AI service request failed: ${res.status} ${res.statusText}`,
     );
   }
 
@@ -346,17 +346,17 @@ async function postJson<TResp>(
   } catch {
     // Successful status but not JSON (unexpected)
     log.error(`AI service returned non-JSON for ${url}:`, rawText);
-    throw new Error('AI service returned non-JSON response');
+    throw new Error("AI service returned non-JSON response");
   }
 }
 
 // ---------- Public API ----------
 
-const AI_SERVICE_URL = normalizeBaseUrl(requiredEnv('AI_SERVICE_URL'));
-const AI_SERVICE_TOKEN = requiredEnv('AI_SERVICE_TOKEN');
+const AI_SERVICE_URL = normalizeBaseUrl(requiredEnv("AI_SERVICE_URL"));
+const AI_SERVICE_TOKEN = requiredEnv("AI_SERVICE_TOKEN");
 
-const PROCESS_PATH = '/v1/ai/attendees/process';
-const RECS_PATH = '/v1/ai/attendees/recommendations';
+const PROCESS_PATH = "/v1/ai/attendees/process";
+const RECS_PATH = "/v1/ai/attendees/recommendations";
 
 const PROCESS_URL = joinUrl(AI_SERVICE_URL, PROCESS_PATH);
 const RECS_URL = joinUrl(AI_SERVICE_URL, RECS_PATH);
@@ -366,13 +366,13 @@ const RECS_URL = joinUrl(AI_SERVICE_URL, RECS_PATH);
  * Mirrors POST /api/v1/ai/attendees/process
  */
 export async function processAttendee(
-  payload: ProcessAttendeeRequest
+  payload: ProcessAttendeeRequest,
 ): Promise<ProcessAttendeeResponse> {
   const clean = normalizeProcessPayload(payload);
   return postJson<ProcessAttendeeResponse>(
     PROCESS_URL,
     clean,
-    AI_SERVICE_TOKEN
+    AI_SERVICE_TOKEN,
   );
 }
 
@@ -381,7 +381,7 @@ export async function processAttendee(
  * Mirrors POST /api/v1/ai/attendees/recommendations
  */
 export async function getRecommendations(
-  payload: ProcessAttendeeRequest // same schema as /process
+  payload: ProcessAttendeeRequest, // same schema as /process
 ): Promise<RecommendationsResponse> {
   const clean = normalizeProcessPayload(payload);
   return postJson<RecommendationsResponse>(RECS_URL, clean, AI_SERVICE_TOKEN);
@@ -392,10 +392,10 @@ export async function getRecommendations(
  * of concurrent requests and proper caching
  */
 export async function getRecommendationsWithSingleton(
-  payload: ProcessAttendeeRequest
+  payload: ProcessAttendeeRequest,
 ): Promise<RecommendationsResponse> {
   return AIServiceManager.getInstance().getRecommendationsWithSingleton(
-    payload
+    payload,
   );
 }
 
@@ -406,7 +406,7 @@ globalThis.setInterval(
   () => {
     AIServiceManager.getInstance().cleanup();
   },
-  5 * 60 * 1000
+  5 * 60 * 1000,
 );
 
 // ---------- Optional: tiny smoke test helper (manual) ----------
@@ -416,52 +416,52 @@ globalThis.setInterval(
 export async function __smoke() {
   try {
     const sample: ProcessAttendeeRequest = {
-      eventId: '550e8400-e29b-41d4-a716-446655440000',
+      eventId: "550e8400-e29b-41d4-a716-446655440000",
       attendee: {
-        attendeeId: '123e4567-e89b-12d3-a456-426614174000',
-        nickname: 'Alice Johnson',
-        profession: { name: 'Software Engineer', categoryName: 'Technology' },
-        goalsCategory: { name: 'Career Development' },
+        attendeeId: "123e4567-e89b-12d3-a456-426614174000",
+        nickname: "Alice Johnson",
+        profession: { name: "Software Engineer", categoryName: "Technology" },
+        goalsCategory: { name: "Career Development" },
         answers: [
           {
-            question: 'What are your primary career goals?',
-            questionType: 'MULTI_SELECT',
-            answerLabel: 'Learn new technologies',
+            question: "What are your primary career goals?",
+            questionType: "MULTI_SELECT",
+            answerLabel: "Learn new technologies",
           },
           {
-            question: 'What are your primary career goals?',
-            questionType: 'MULTI_SELECT',
-            answerLabel: 'Network with peers',
+            question: "What are your primary career goals?",
+            questionType: "MULTI_SELECT",
+            answerLabel: "Network with peers",
             weight: 0.9,
           },
           {
-            question: 'How many years of experience do you have?',
-            questionType: 'NUMBER',
+            question: "How many years of experience do you have?",
+            questionType: "NUMBER",
             numberValue: 5,
           },
           {
-            question: 'Describe your ideal collaboration style',
-            questionType: 'FREE_TEXT',
+            question: "Describe your ideal collaboration style",
+            questionType: "FREE_TEXT",
             textValue:
-              'I prefer structured communication with clear goals and regular check-ins.',
+              "I prefer structured communication with clear goals and regular check-ins.",
           },
           {
-            question: 'Rate your interest in leadership roles',
-            questionType: 'SCALE',
+            question: "Rate your interest in leadership roles",
+            questionType: "SCALE",
             numberValue: 8,
           },
         ],
       },
     };
 
-    log.info('PROCESS start');
+    log.info("PROCESS start");
     const proc = await processAttendee(sample);
-    log.info('PROCESS ok:', proc);
+    log.info("PROCESS ok:", proc);
 
-    log.info('RECS start');
+    log.info("RECS start");
     const recs = await getRecommendations(sample);
-    log.info('RECS ok:', recs);
+    log.info("RECS ok:", recs);
   } catch (err) {
-    log.error('Smoke test failed:', err);
+    log.error("Smoke test failed:", err);
   }
 }

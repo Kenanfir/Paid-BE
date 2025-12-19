@@ -268,6 +268,34 @@ For detailed documentation, see the [`docs/`](./docs) folder:
 | `pnpm prisma:studio`   | Open Prisma Studio               |
 | `pnpm prisma:seed`     | Seed the database                |
 
+## Future Development
+
+### Player-Account Linking
+
+When a host adds a player who doesn't have an account yet, the player record is created without a linked user. The following feature needs to be implemented to connect new users to their existing player records:
+
+**Scenario:**
+1. Host creates session and adds player "John" with phone `+628123456789`
+2. A `Player` record is created with `userId = NULL`
+3. Later, John creates an account with the same phone number
+4. **Problem**: How to connect John's new `User` to his existing `Player` records?
+
+**Proposed Solution - Automatic Phone/Email Matching:**
+- When a new user registers, check if their phone OR email matches any unlinked `Player` records
+- Automatically set `Player.userId = newUser.id` for matching records
+- Add endpoint `GET /api/sessions?role=player` to show sessions where user is a participant (not host)
+
+**Implementation Steps:**
+1. Modify `register` endpoint in `auth.controller.ts` to:
+   - After creating User, find `Player` records with matching phone/email where `userId IS NULL`
+   - Update those Players to link to the new User
+2. Add "As Attendee" filter to `getMySessions` to return sessions where user's linked Player is a participant
+
+**Database Support:**
+The schema already supports this via `Player.userId` → `User.id` relationship (see `prisma/schema.prisma` lines 99-125).
+
+---
+
 ## License
 
 ISC

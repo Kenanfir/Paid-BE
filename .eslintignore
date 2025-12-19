@@ -1,0 +1,9 @@
+# Build output
+dist/
+build/
+
+# Node modules
+node_modules/
+
+# Test files (not included in tsconfig)
+tests/

@@ -1,12 +1,12 @@
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import compression from 'compression';
-import { morganStream, logger } from '../config/logger';
-import { sendError } from '../utils/response';
-import routes from '../routes/index';
-import { ApiErrorDetail } from '../types';
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import compression from "compression";
+import { morganStream, logger } from "../config/logger";
+import { sendError } from "../utils/response";
+import routes from "../routes/index";
+import { ApiErrorDetail } from "../types";
 
 // Create Express app
 const app = express();
@@ -17,36 +17,36 @@ app.use(cors()); // Enable CORS
 app.use(compression()); // Compress responses
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use(morgan('combined', { stream: morganStream })); // HTTP request logging
+app.use(morgan("combined", { stream: morganStream })); // HTTP request logging
 
 // API routes
-app.use('/api', routes);
+app.use("/api", routes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
   sendError(
     res,
-    'Not Found',
-    [{ field: 'url', message: `Route ${req.originalUrl} not found` }],
-    404
+    "Not Found",
+    [{ field: "url", message: `Route ${req.originalUrl} not found` }],
+    404,
   );
 });
 
 // Error handler
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-  logger.error('Unhandled error:', err);
+  logger.error("Unhandled error:", err);
 
   const errors: ApiErrorDetail[] = [
     {
-      field: 'server',
+      field: "server",
       message:
-        process.env.ENVIRONMENT === 'production'
-          ? 'An unexpected error occurred'
-          : err.message || 'Unknown error',
+        process.env.ENVIRONMENT === "production"
+          ? "An unexpected error occurred"
+          : err.message || "Unknown error",
     },
   ];
 
-  sendError(res, 'Server Error', errors, 500);
+  sendError(res, "Server Error", errors, 500);
 });
 
 export default app;

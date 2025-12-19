@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { validationResult } from 'express-validator';
-import { sendError } from './response';
-import { ApiErrorDetail } from '../types';
+import { Request, Response, NextFunction } from "express";
+import { validationResult } from "express-validator";
+import { sendError } from "./response";
+import { ApiErrorDetail } from "../types";
 
 /**
  * Middleware to validate request data
@@ -12,7 +12,7 @@ import { ApiErrorDetail } from '../types';
 export const validate = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   const errors = validationResult(req);
 
@@ -20,10 +20,12 @@ export const validate = (
     return next();
   }
 
-  const validationErrors: ApiErrorDetail[] = errors.array().map((error: { path?: string; msg?: string }) => ({
-    field: error.path || 'unknown',
-    message: error.msg || 'Validation error',
-  }));
+  const validationErrors: ApiErrorDetail[] = errors
+    .array()
+    .map((error: { path?: string; msg?: string }) => ({
+      field: error.path || "unknown",
+      message: error.msg || "Validation error",
+    }));
 
-  sendError(res, 'Validation Error', validationErrors, 400);
+  sendError(res, "Validation Error", validationErrors, 400);
 };
