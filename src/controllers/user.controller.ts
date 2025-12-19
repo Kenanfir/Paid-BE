@@ -108,23 +108,32 @@ export const updateMyProfile = async (
 ): Promise<void> => {
   try {
     const userId = req.userId;
-    const { name, phone, photoUrl, bankName, bankAccountNumber, bankAccountName } = req.body as UserProfileUpdateInput;
+    // Accept both camelCase and snake_case field names (iOS sends snake_case)
+    const body = req.body;
+    const name = body.name;
+    const phone = body.phone;
+    const photoUrl = body.photoUrl ?? body.photo_url;
+    const bankName = body.bankName ?? body.bank_name;
+    const bankAccountNumber = body.bankAccountNumber ?? body.bank_account_number;
+    const bankAccountName = body.bankAccountName ?? body.bank_account_name;
 
     if (!userId) {
       sendError(res, "Authentication required", [], 401);
       return;
     }
 
+    const updateData = {
+      ...(name && { name }),
+      ...(phone !== undefined && { phone }),
+      ...(photoUrl !== undefined && { photoUrl }),
+      ...(bankName !== undefined && { bankName }),
+      ...(bankAccountNumber !== undefined && { bankAccountNumber }),
+      ...(bankAccountName !== undefined && { bankAccountName }),
+    };
+
     const updated = await prisma.user.update({
       where: { id: userId },
-      data: {
-        ...(name && { name }),
-        ...(phone !== undefined && { phone }),
-        ...(photoUrl !== undefined && { photoUrl }),
-        ...(bankName !== undefined && { bankName }),
-        ...(bankAccountNumber !== undefined && { bankAccountNumber }),
-        ...(bankAccountName !== undefined && { bankAccountName }),
-      },
+      data: updateData,
     });
 
     // Also update linked player if exists

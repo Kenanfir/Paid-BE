@@ -147,6 +147,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         name: user.name,
         phone: user.phone,
         photoUrl: user.photoUrl,
+        bankAccount: user.bankName ? {
+          bankName: user.bankName,
+          accountNumber: user.bankAccountNumber,
+          accountName: user.bankAccountName,
+        } : null,
         isActive: user.isActive,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
@@ -205,6 +210,11 @@ export const getProfile = async (
       name: user.name,
       phone: user.phone,
       photoUrl: user.photoUrl,
+      bankAccount: user.bankName ? {
+        bankName: user.bankName,
+        accountNumber: user.bankAccountNumber,
+        accountName: user.bankAccountName,
+      } : null,
       isActive: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
