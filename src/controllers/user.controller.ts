@@ -474,10 +474,16 @@ export const deleteAccount = async (
       },
     });
 
-    // Also soft delete linked player
+    // Also soft delete linked player and anonymize their email too
     await prisma.player.updateMany({
       where: { userId },
-      data: { isActive: false, deletedAt },
+      data: {
+        isActive: false,
+        deletedAt,
+        email: anonymizedEmail, // Same anonymized email to avoid unique constraint
+        name: "Deleted User",
+        phone: null,
+      },
     });
 
     sendSuccess(res, "Account deleted successfully", null);
