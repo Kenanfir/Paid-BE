@@ -23,9 +23,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, name, phone } = req.body as RegisterInput;
 
-    // Check if email already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    // Check if email already exists (only check active users)
+    const existingUser = await prisma.user.findFirst({
+      where: { email, isActive: true },
     });
 
     if (existingUser) {
@@ -38,28 +38,76 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Also check for active players with this email
+    const existingPlayer = await prisma.player.findFirst({
+      where: { email, isActive: true, userId: null }, // Unlinked active player
+    });
+
+    if (existingPlayer) {
+      sendError(
+        res,
+        "Registration failed",
+        [{ field: "email", message: "Email already in use" }],
+        400,
+      );
+      return;
+    }
+
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        name,
-        phone,
-      },
+    // Check for existing deleted user with this email (for re-registration)
+    const deletedUser = await prisma.user.findFirst({
+      where: { email, isActive: false },
     });
 
-    // Also create a player record linked to this user
-    await prisma.player.create({
-      data: {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-      },
-    });
+    let user;
+    if (deletedUser) {
+      // Reactivate the deleted user
+      user = await prisma.user.update({
+        where: { id: deletedUser.id },
+        data: {
+          email,
+          passwordHash,
+          name,
+          phone,
+          isActive: true,
+          deletedAt: null,
+        },
+      });
+
+      // Reactivate or create linked player
+      await prisma.player.updateMany({
+        where: { userId: user.id },
+        data: {
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          isActive: true,
+          deletedAt: null,
+        },
+      });
+    } else {
+      // Create new user
+      user = await prisma.user.create({
+        data: {
+          email,
+          passwordHash,
+          name,
+          phone,
+        },
+      });
+
+      // Also create a player record linked to this user
+      await prisma.player.create({
+        data: {
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+        },
+      });
+    }
 
     // Generate token
     const token = generateToken({
