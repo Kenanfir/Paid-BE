@@ -458,16 +458,26 @@ export const deleteAccount = async (
       return;
     }
 
-    // Soft delete user
+    // Soft delete user - anonymize email to allow re-registration
+    const deletedAt = new Date();
+    const anonymizedEmail = `deleted_${deletedAt.getTime()}_${userId.slice(0, 8)}@deleted.local`;
+
     await prisma.user.update({
       where: { id: userId },
-      data: { isActive: false, deletedAt: new Date() },
+      data: {
+        isActive: false,
+        deletedAt,
+        email: anonymizedEmail, // Allow email reuse
+        name: "Deleted User",
+        phone: null,
+        photoUrl: null,
+      },
     });
 
     // Also soft delete linked player
     await prisma.player.updateMany({
       where: { userId },
-      data: { isActive: false, deletedAt: new Date() },
+      data: { isActive: false, deletedAt },
     });
 
     sendSuccess(res, "Account deleted successfully", null);
